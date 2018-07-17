@@ -3,7 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.sejoung</groupId>
     <artifactId>tomcat-jdbc-encrypt</artifactId>
-    <version>1.0</version>
+    <version>1.3</version>
+<!--
+    <version>1.3-SNAPSHOT</version>
+
+    <version>1.3</version>
+-->
     <name>${project.groupId}:${project.artifactId}</name>
     <description>tomcat-jdbc-encrypt</description>
     <url>https://github.com/sejoung</url>
@@ -23,7 +28,7 @@
         <url>http://github.com/sejoung/tomcat-jdbc-encrypt/tree/master</url>
         <developerConnection>scm:git:http://github.com/sejoung/tomcat-jdbc-encrypt.git</developerConnection>
         <connection>scm:git:https://github.com/sejoung/tomcat-jdbc-encrypt.git</connection>
-        <tag>navigator-1.0</tag>
+        <tag>tomcat-jdbc-encrypt</tag>
     </scm>
     <issueManagement>
         <url>https://github.com/sejoung/tomcat-jdbc-encrypt/issues</url>
@@ -109,6 +114,17 @@
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>deploy</goals>
                 </configuration>
             </plugin>
             <plugin>

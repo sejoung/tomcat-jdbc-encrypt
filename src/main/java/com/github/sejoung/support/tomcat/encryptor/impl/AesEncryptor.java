@@ -17,6 +17,10 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 
+/**
+ * AES 암호화
+ *
+ */
 public class AesEncryptor implements Encryptor {
 	private static final String ALGORITHM = "AES";
 	private static final String defaultSecretKey = "killers";
@@ -26,6 +30,10 @@ public class AesEncryptor implements Encryptor {
 		this(null);
 	}
 
+	/**
+	 * 단축키
+	 * @param secretKey
+	 */
 	public AesEncryptor(String secretKey) {
 		this.secretKeySpec = generateKey(secretKey);
 	}
