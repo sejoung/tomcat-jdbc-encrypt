@@ -20,24 +20,21 @@ import org.apache.tomcat.jdbc.pool.XADataSource;
 
 public class EncryptedDataSourceFactory extends DataSourceFactory {
 	private static final Log log = LogFactory.getLog(EncryptedDataSourceFactory.class);
-	private Encryptor encryptor = null;
 
 	public EncryptedDataSourceFactory() {
-		if (this.encryptor == null) {
-			this.encryptor = new AesEncryptor();
-		}
 	}
 
 	public javax.sql.DataSource createDataSource(Properties properties, Context context, boolean XA) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, SQLException, NoSuchAlgorithmException, NoSuchPaddingException {
 		PoolConfiguration poolProperties = parsePoolProperties(properties);
+		Encryptor encryptor = new AesEncryptor(properties.getProperty("secretKey"));
 
-		log.debug("password " + poolProperties.getPassword() + " decrypt password " + this.encryptor.decrypt(poolProperties.getPassword()));
+		log.debug("password " + poolProperties.getPassword() + " decrypt password " + encryptor.decrypt(poolProperties.getPassword()));
 
-		poolProperties.setPassword(this.encryptor.decrypt(poolProperties.getPassword()));
+		poolProperties.setPassword(encryptor.decrypt(poolProperties.getPassword()));
 
-		log.debug("username " + poolProperties.getUsername() + " decrypt username " + this.encryptor.decrypt(poolProperties.getUsername()));
+		log.debug("username " + poolProperties.getUsername() + " decrypt username " + encryptor.decrypt(poolProperties.getUsername()));
 
-		poolProperties.setUsername(this.encryptor.decrypt(poolProperties.getUsername()));
+		poolProperties.setUsername(encryptor.decrypt(poolProperties.getUsername()));
 		if ((poolProperties.getDataSourceJNDI() != null) && (poolProperties.getDataSource() == null)) {
 			performJNDILookup(context, poolProperties);
 		}

@@ -73,10 +73,13 @@ public class EncryptedDataSourceFactoryDbcp implements ObjectFactory {
 
 	public static DataSource createDataSource(Properties properties) throws Exception {
 		BasicDataSource dataSource = new BasicDataSource();
-		Encryptor encryptor = new AesEncryptor();
 
 		String value = null;
+        value = properties.getProperty("secretKey");
 
+	    Encryptor encryptor = new AesEncryptor(value);
+
+		
 		value = properties.getProperty("defaultAutoCommit");
 		if (value != null) {
 			dataSource.setDefaultAutoCommit(Boolean.valueOf(value).booleanValue());
