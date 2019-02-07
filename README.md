@@ -54,8 +54,17 @@ pom.xml에 추가후에 위에 처럼 사용가능
 <dependency>
     <groupId>com.github.sejoung</groupId>
     <artifactId>tomcat-jdbc-encrypt</artifactId>
-    <version>1.0</version>
+    <version>1.4</version>
 </dependency>
 
 ```
+1.4 버전에 decrypt 추가
 
+USAGE: java -jar tomcat-jdbc-encrypt-[version].jar [encrypt,decrypt] [secretKey] [string-to-encrypt,string-to-decrypt]
+
+```
+java -jar tomcat-jdbc-encrypt-1.4.jar encrypt key 1
+
+java -jar tomcat-jdbc-encrypt-1.4.jar decrypt key eb77d942479a6b2e44841d653175e8a3
+
+```
