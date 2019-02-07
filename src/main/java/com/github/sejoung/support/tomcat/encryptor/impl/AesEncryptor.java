@@ -1,6 +1,7 @@
 package com.github.sejoung.support.tomcat.encryptor.impl;
 
 import com.github.sejoung.support.tomcat.encryptor.Encryptor;
+import com.github.sejoung.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
@@ -23,17 +24,13 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class AesEncryptor implements Encryptor {
 	private static final String ALGORITHM = "AES";
-	private static final String defaultSecretKey = "killers";
+	private static final String defaultSecretKey = "secret";
 	private Key secretKeySpec;
 
 	public AesEncryptor() {
 		this(null);
 	}
 
-	/**
-	 * 단축키
-	 * @param secretKey
-	 */
 	public AesEncryptor(String secretKey) {
 		this.secretKeySpec = generateKey(secretKey);
 	}
@@ -50,8 +47,9 @@ public class AesEncryptor implements Encryptor {
 		return new String(cipher.doFinal(toByteArray(encryptedString)));
 	}
 
+	
 	private Key generateKey(String secretKey) {
-		if (secretKey == null) {
+		if (StringUtils.isEmpty(secretKey)) {
 			secretKey = defaultSecretKey;
 		}
 		try {
@@ -92,11 +90,32 @@ public class AesEncryptor implements Encryptor {
 	}
 
 	public static void main(String[] args) throws Exception {
-		if ((args.length == 1) || (args.length == 2)) {
-			String secretKey = args.length == 2 ? args[1] : null;
-			System.out.println(args[0] + ": " + new AesEncryptor(secretKey).encrypt(args[0]));
+		if ((args.length == 3)) {
+
+		    String mode = args[0];
+            String secretKey = args[1];
+            String text = args[2];
+		    if("encrypt".equals(mode)) {
+	            AesEncryptor ae = new AesEncryptor(secretKey);
+	            String encryptedString = ae.encrypt(text);
+	            String decryptedString = ae.decrypt(encryptedString);
+	            System.out.println(decryptedString + ": " + encryptedString);
+		    }else if("decrypt".equals(mode)) {
+		        if(args.length != 3) {
+		            return;
+		        } else {
+	                AesEncryptor ae = new AesEncryptor(secretKey);
+	                String decryptedString = ae.decrypt(text);
+	                System.out.println("decryptedString : " + decryptedString);
+
+		        }
+		        
+		    }
+		    
+			
+			
 		} else {
-			System.out.println("USAGE: java Encryptor string-to-encrypt [secretKey]");
+			System.out.println("USAGE: java -jar tomcat-jdbc-encrypt-[version].jar [encrypt,decrypt] [secretKey] [string-to-encrypt,string-to-decrypt] ");
 		}
 	}
 }
