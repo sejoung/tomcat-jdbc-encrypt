@@ -1,24 +1,23 @@
 package com.github.sejoung.support.tomcat.jdbc;
 
+import com.github.sejoung.support.tomcat.encryptor.Encryptor;
+import com.github.sejoung.support.tomcat.encryptor.impl.AesEncryptor;
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 import java.util.StringTokenizer;
-
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 import javax.sql.DataSource;
-
-import com.github.sejoung.support.tomcat.encryptor.Encryptor;
-import com.github.sejoung.support.tomcat.encryptor.impl.AesEncryptor;
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 
 public class EncryptedDataSourceFactoryDbcp implements ObjectFactory {
+
 	private static final String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
 	private static final String PROP_DEFAULTREADONLY = "defaultReadOnly";
 	private static final String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
@@ -49,37 +48,22 @@ public class EncryptedDataSourceFactoryDbcp implements ObjectFactory {
 	private static final String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
 	private static final String PROP_CONNECTIONPROPERTIES = "connectionProperties";
 	private static final int UNKNOWN_TRANSACTIONISOLATION = -1;
-	private static final String[] ALL_PROPERTIES = { "defaultAutoCommit", "defaultReadOnly", "defaultTransactionIsolation", "defaultCatalog", "driverClassName", "maxActive", "maxIdle", "minIdle", "initialSize", "maxWait", "testOnBorrow", "testOnReturn", "timeBetweenEvictionRunsMillis", "numTestsPerEvictionRun", "minEvictableIdleTimeMillis", "testWhileIdle", "password", "url", "username", "validationQuery", "validationQueryTimeout", "initConnectionSqls", "accessToUnderlyingConnectionAllowed", "removeAbandoned", "removeAbandonedTimeout", "logAbandoned", "poolPreparedStatements", "maxOpenPreparedStatements", "connectionProperties" };
-
-	public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable environment) throws Exception {
-		if ((obj == null) || (!(obj instanceof Reference))) {
-			return null;
-		}
-		Reference ref = (Reference) obj;
-		if (!"javax.sql.DataSource".equals(ref.getClassName())) {
-			return null;
-		}
-		Properties properties = new Properties();
-		for (int i = 0; i < ALL_PROPERTIES.length; i++) {
-			String propertyName = ALL_PROPERTIES[i];
-			RefAddr ra = ref.get(propertyName);
-			if (ra != null) {
-				String propertyValue = ra.getContent().toString();
-				properties.setProperty(propertyName, propertyValue);
-			}
-		}
-		return createDataSource(properties);
-	}
+	private static final String[] ALL_PROPERTIES = {"defaultAutoCommit", "defaultReadOnly",
+			"defaultTransactionIsolation", "defaultCatalog", "driverClassName", "maxActive", "maxIdle",
+			"minIdle", "initialSize", "maxWait", "testOnBorrow", "testOnReturn",
+			"timeBetweenEvictionRunsMillis", "numTestsPerEvictionRun", "minEvictableIdleTimeMillis",
+			"testWhileIdle", "password", "url", "username", "validationQuery", "validationQueryTimeout",
+			"initConnectionSqls", "accessToUnderlyingConnectionAllowed", "removeAbandoned",
+			"removeAbandonedTimeout", "logAbandoned", "poolPreparedStatements",
+			"maxOpenPreparedStatements", "connectionProperties", "secretKey"};
 
 	public static DataSource createDataSource(Properties properties) throws Exception {
 		BasicDataSource dataSource = new BasicDataSource();
 
-		String value = null;
-        value = properties.getProperty("secretKey");
+		String value = properties.getProperty("secretKey");
 
-	    Encryptor encryptor = new AesEncryptor(value);
+		Encryptor encryptor = new AesEncryptor(value);
 
-		
 		value = properties.getProperty("defaultAutoCommit");
 		if (value != null) {
 			dataSource.setDefaultAutoCommit(Boolean.valueOf(value).booleanValue());
@@ -235,5 +219,26 @@ public class EncryptedDataSourceFactoryDbcp implements ObjectFactory {
 			p.load(new ByteArrayInputStream(propText.replace(';', '\n').getBytes()));
 		}
 		return p;
+	}
+
+	public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable environment)
+			throws Exception {
+		if ((obj == null) || (!(obj instanceof Reference))) {
+			return null;
+		}
+		Reference ref = (Reference) obj;
+		if (!"javax.sql.DataSource".equals(ref.getClassName())) {
+			return null;
+		}
+		Properties properties = new Properties();
+		for (int i = 0; i < ALL_PROPERTIES.length; i++) {
+			String propertyName = ALL_PROPERTIES[i];
+			RefAddr ra = ref.get(propertyName);
+			if (ra != null) {
+				String propertyValue = ra.getContent().toString();
+				properties.setProperty(propertyName, propertyValue);
+			}
+		}
+		return createDataSource(properties);
 	}
 }

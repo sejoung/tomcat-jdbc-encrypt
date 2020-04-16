@@ -4,11 +4,6 @@
     <groupId>com.github.sejoung</groupId>
     <artifactId>tomcat-jdbc-encrypt</artifactId>
     <version>1.5</version>
-<!--
-    <version>1.5-SNAPSHOT</version>
-
-    <version>1.5</version>
--->
     <name>${project.groupId}:${project.artifactId}</name>
     <description>tomcat-jdbc-encrypt</description>
     <url>https://github.com/sejoung</url>
@@ -51,6 +46,13 @@
             <artifactId>tomcat-dbcp</artifactId>
             <version>${tomcat.version}</version>
             <scope>provided</scope>
+
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <distributionManagement>
@@ -138,6 +140,14 @@
                             <mainClass>com.github.sejoung.support.tomcat.encryptor.impl.AesEncryptor</mainClass>
                         </manifest>
                     </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>6</source>
+                    <target>6</target>
                 </configuration>
             </plugin>
         </plugins>
