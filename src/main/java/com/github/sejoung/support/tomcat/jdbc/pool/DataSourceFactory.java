@@ -4,7 +4,6 @@ package com.github.sejoung.support.tomcat.jdbc.pool;
 import java.sql.Connection;
 import java.util.Hashtable;
 import java.util.Properties;
-
 import javax.management.ObjectName;
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -14,54 +13,31 @@ import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 import javax.sql.DataSource;
-
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 
-/**
- * <p>JNDI object factory that creates an instance of
- * <code>BasicDataSource</code> that has been configured based on the
- * <code>RefAddr</code> values of the specified <code>Reference</code>,
- * which must match the names and data types of the
- * <code>BasicDataSource</code> bean properties.</p>
- * <br>
- * Properties available for configuration:<br>
- * <a href="https://commons.apache.org/dbcp/configuration.html">Commons DBCP properties</a><br>
- *<ol>
- *  <li>initSQL - A query that gets executed once, right after the connection is established.</li>
- *  <li>testOnConnect - run validationQuery after connection has been established.</li>
- *  <li>validationInterval - avoid excess validation, only run validation at most at this frequency - time in milliseconds.</li>
- *  <li>jdbcInterceptors - a semicolon separated list of classnames extending {@link JdbcInterceptor} class.</li>
- *  <li>jmxEnabled - true of false, whether to register the pool with JMX.</li>
- *  <li>fairQueue - true of false, whether the pool should sacrifice a little bit of performance for true fairness.</li>
- *</ol>
- * @author Craig R. McClanahan
- * @author Dirk Verbeeck
- * @author Filip Hanik
- */
-public class DataSourceFactory implements ObjectFactory {
-	private static final Log log = LogFactory.getLog(org.apache.tomcat.jdbc.pool.DataSourceFactory.class);
 
+public class DataSourceFactory implements ObjectFactory {
+
+	public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
+	public static final String OBJECT_NAME = "object_name";
+	public static final String PROP_SECRET_KEY = "secretKey";
 	protected static final String PROP_DEFAULTAUTOCOMMIT = "defaultAutoCommit";
 	protected static final String PROP_DEFAULTREADONLY = "defaultReadOnly";
 	protected static final String PROP_DEFAULTTRANSACTIONISOLATION = "defaultTransactionIsolation";
 	protected static final String PROP_DEFAULTCATALOG = "defaultCatalog";
-
 	protected static final String PROP_DRIVERCLASSNAME = "driverClassName";
 	protected static final String PROP_PASSWORD = "password";
 	protected static final String PROP_URL = "url";
 	protected static final String PROP_USERNAME = "username";
-
 	protected static final String PROP_MAXACTIVE = "maxActive";
 	protected static final String PROP_MAXIDLE = "maxIdle";
 	protected static final String PROP_MINIDLE = "minIdle";
 	protected static final String PROP_INITIALSIZE = "initialSize";
 	protected static final String PROP_MAXWAIT = "maxWait";
 	protected static final String PROP_MAXAGE = "maxAge";
-
 	protected static final String PROP_TESTONBORROW = "testOnBorrow";
 	protected static final String PROP_TESTONRETURN = "testOnReturn";
 	protected static final String PROP_TESTWHILEIDLE = "testWhileIdle";
@@ -69,57 +45,35 @@ public class DataSourceFactory implements ObjectFactory {
 	protected static final String PROP_VALIDATIONQUERY = "validationQuery";
 	protected static final String PROP_VALIDATIONQUERY_TIMEOUT = "validationQueryTimeout";
 	protected static final String PROP_VALIDATOR_CLASS_NAME = "validatorClassName";
-
 	protected static final String PROP_NUMTESTSPEREVICTIONRUN = "numTestsPerEvictionRun";
 	protected static final String PROP_TIMEBETWEENEVICTIONRUNSMILLIS = "timeBetweenEvictionRunsMillis";
 	protected static final String PROP_MINEVICTABLEIDLETIMEMILLIS = "minEvictableIdleTimeMillis";
-
 	protected static final String PROP_ACCESSTOUNDERLYINGCONNECTIONALLOWED = "accessToUnderlyingConnectionAllowed";
-
 	protected static final String PROP_REMOVEABANDONED = "removeAbandoned";
 	protected static final String PROP_REMOVEABANDONEDTIMEOUT = "removeAbandonedTimeout";
 	protected static final String PROP_LOGABANDONED = "logAbandoned";
 	protected static final String PROP_ABANDONWHENPERCENTAGEFULL = "abandonWhenPercentageFull";
-
 	protected static final String PROP_POOLPREPAREDSTATEMENTS = "poolPreparedStatements";
 	protected static final String PROP_MAXOPENPREPAREDSTATEMENTS = "maxOpenPreparedStatements";
 	protected static final String PROP_CONNECTIONPROPERTIES = "connectionProperties";
-
 	protected static final String PROP_INITSQL = "initSQL";
 	protected static final String PROP_INTERCEPTORS = "jdbcInterceptors";
 	protected static final String PROP_VALIDATIONINTERVAL = "validationInterval";
 	protected static final String PROP_JMX_ENABLED = "jmxEnabled";
 	protected static final String PROP_FAIR_QUEUE = "fairQueue";
-
 	protected static final String PROP_USE_EQUALS = "useEquals";
 	protected static final String PROP_USE_CON_LOCK = "useLock";
-
-	protected static final String PROP_DATASOURCE= "dataSource";
+	protected static final String PROP_DATASOURCE = "dataSource";
 	protected static final String PROP_DATASOURCE_JNDI = "dataSourceJNDI";
-
 	protected static final String PROP_SUSPECT_TIMEOUT = "suspectTimeout";
-
 	protected static final String PROP_ALTERNATE_USERNAME_ALLOWED = "alternateUsernameAllowed";
-
 	protected static final String PROP_COMMITONRETURN = "commitOnReturn";
 	protected static final String PROP_ROLLBACKONRETURN = "rollbackOnReturn";
-
 	protected static final String PROP_USEDISPOSABLECONNECTIONFACADE = "useDisposableConnectionFacade";
-
 	protected static final String PROP_LOGVALIDATIONERRORS = "logValidationErrors";
-
 	protected static final String PROP_PROPAGATEINTERRUPTSTATE = "propagateInterruptState";
-
 	protected static final String PROP_IGNOREEXCEPTIONONPRELOAD = "ignoreExceptionOnPreLoad";
-
 	protected static final String PROP_USESTATEMENTFACADE = "useStatementFacade";
-
-	public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
-
-	public static final String OBJECT_NAME = "object_name";
-	public static final String PROP_SECRET_KEY = "secretKey";
-
-
 	protected static final String[] ALL_PROPERTIES = {
 			PROP_DEFAULTAUTOCOMMIT,
 			PROP_DEFAULTREADONLY,
@@ -174,65 +128,8 @@ public class DataSourceFactory implements ObjectFactory {
 			PROP_USESTATEMENTFACADE,
 			PROP_SECRET_KEY
 	};
-
-	// -------------------------------------------------- ObjectFactory Methods
-
-	/**
-	 * <p>Create and return a new <code>BasicDataSource</code> instance.  If no
-	 * instance can be created, return <code>null</code> instead.</p>
-	 *
-	 * @param obj The possibly null object containing location or
-	 *  reference information that can be used in creating an object
-	 * @param name The name of this object relative to <code>nameCtx</code>
-	 * @param nameCtx The context relative to which the <code>name</code>
-	 *  parameter is specified, or <code>null</code> if <code>name</code>
-	 *  is relative to the default initial context
-	 * @param environment The possibly null environment that is used in
-	 *  creating this object
-	 *
-	 * @exception Exception if an exception occurs creating the instance
-	 */
-	@Override
-	public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-			Hashtable<?,?> environment) throws Exception {
-
-		// We only know how to deal with <code>javax.naming.Reference</code>s
-		// that specify a class name of "javax.sql.DataSource"
-		if ((obj == null) || !(obj instanceof Reference)) {
-			return null;
-		}
-		Reference ref = (Reference) obj;
-		boolean XA = false;
-		boolean ok = false;
-		if ("javax.sql.DataSource".equals(ref.getClassName())) {
-			ok = true;
-		}
-		if ("javax.sql.XADataSource".equals(ref.getClassName())) {
-			ok = true;
-			XA = true;
-		}
-		if (org.apache.tomcat.jdbc.pool.DataSource.class.getName().equals(ref.getClassName())) {
-			ok = true;
-		}
-
-		if (!ok) {
-			log.warn(ref.getClassName()+" is not a valid class name/type for this JNDI factory.");
-			return null;
-		}
-
-
-		Properties properties = new Properties();
-		for (int i = 0; i < ALL_PROPERTIES.length; i++) {
-			String propertyName = ALL_PROPERTIES[i];
-			RefAddr ra = ref.get(propertyName);
-			if (ra != null) {
-				String propertyValue = ra.getContent().toString();
-				properties.setProperty(propertyName, propertyValue);
-			}
-		}
-
-		return createDataSource(properties,nameCtx,XA);
-	}
+	private static final Log log = LogFactory
+			.getLog(org.apache.tomcat.jdbc.pool.DataSourceFactory.class);
 
 	public static PoolConfiguration parsePoolProperties(Properties properties) {
 		PoolConfiguration poolProperties = new PoolProperties();
@@ -417,11 +314,11 @@ public class DataSourceFactory implements ObjectFactory {
 			poolProperties.setDbProperties(new Properties());
 		}
 
-		if (poolProperties.getUsername()!=null) {
-			poolProperties.getDbProperties().setProperty("user",poolProperties.getUsername());
+		if (poolProperties.getUsername() != null) {
+			poolProperties.getDbProperties().setProperty("user", poolProperties.getUsername());
 		}
-		if (poolProperties.getPassword()!=null) {
-			poolProperties.getDbProperties().setProperty("password",poolProperties.getPassword());
+		if (poolProperties.getPassword() != null) {
+			poolProperties.getDbProperties().setProperty("password", poolProperties.getPassword());
 		}
 
 		value = properties.getProperty(PROP_INITSQL);
@@ -472,7 +369,8 @@ public class DataSourceFactory implements ObjectFactory {
 		value = properties.getProperty(PROP_DATASOURCE);
 		if (value != null) {
 			//this should never happen
-			throw new IllegalArgumentException("Can't set dataSource property as a string, this must be a javax.sql.DataSource object.");
+			throw new IllegalArgumentException(
+					"Can't set dataSource property as a string, this must be a javax.sql.DataSource object.");
 
 		}
 
@@ -527,22 +425,63 @@ public class DataSourceFactory implements ObjectFactory {
 		return poolProperties;
 	}
 
-	/**
-	 * Creates and configures a {@link DataSource} instance based on the
-	 * given properties.
-	 *
-	 * @param properties the datasource configuration properties
-	 * @throws Exception if an error occurs creating the data source
-	 */
-	public DataSource createDataSource(Properties properties) throws Exception {
-		return createDataSource(properties,null,false);
+	protected static Properties getProperties(String propText) {
+		return PoolProperties.getProperties(propText, null);
 	}
-	public DataSource createDataSource(Properties properties,Context context, boolean XA) throws Exception {
-		PoolConfiguration poolProperties = org.apache.tomcat.jdbc.pool.DataSourceFactory.parsePoolProperties(properties);
-		if (poolProperties.getDataSourceJNDI()!=null && poolProperties.getDataSource()==null) {
+
+	@Override
+	public Object getObjectInstance(Object obj, Name name, Context nameCtx,
+			Hashtable<?, ?> environment) throws Exception {
+
+		// We only know how to deal with <code>javax.naming.Reference</code>s
+		// that specify a class name of "javax.sql.DataSource"
+		if ((obj == null) || !(obj instanceof Reference)) {
+			return null;
+		}
+		Reference ref = (Reference) obj;
+		boolean XA = false;
+		boolean ok = false;
+		if ("javax.sql.DataSource".equals(ref.getClassName())) {
+			ok = true;
+		}
+		if ("javax.sql.XADataSource".equals(ref.getClassName())) {
+			ok = true;
+			XA = true;
+		}
+		if (org.apache.tomcat.jdbc.pool.DataSource.class.getName().equals(ref.getClassName())) {
+			ok = true;
+		}
+
+		if (!ok) {
+			log.warn(ref.getClassName() + " is not a valid class name/type for this JNDI factory.");
+			return null;
+		}
+
+		Properties properties = new Properties();
+		for (int i = 0; i < ALL_PROPERTIES.length; i++) {
+			String propertyName = ALL_PROPERTIES[i];
+			RefAddr ra = ref.get(propertyName);
+			if (ra != null) {
+				String propertyValue = ra.getContent().toString();
+				properties.setProperty(propertyName, propertyValue);
+			}
+		}
+
+		return createDataSource(properties, nameCtx, XA);
+	}
+
+	public DataSource createDataSource(Properties properties) throws Exception {
+		return createDataSource(properties, null, false);
+	}
+
+	public DataSource createDataSource(Properties properties, Context context, boolean XA)
+			throws Exception {
+		PoolConfiguration poolProperties = org.apache.tomcat.jdbc.pool.DataSourceFactory
+				.parsePoolProperties(properties);
+		if (poolProperties.getDataSourceJNDI() != null && poolProperties.getDataSource() == null) {
 			performJNDILookup(context, poolProperties);
 		}
-		org.apache.tomcat.jdbc.pool.DataSource dataSource = XA?
+		org.apache.tomcat.jdbc.pool.DataSource dataSource = XA ?
 				new org.apache.tomcat.jdbc.pool.XADataSource(poolProperties) :
 				new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
 		//initialise the pool itself
@@ -554,35 +493,27 @@ public class DataSourceFactory implements ObjectFactory {
 	public void performJNDILookup(Context context, PoolConfiguration poolProperties) {
 		Object jndiDS = null;
 		try {
-			if (context!=null) {
+			if (context != null) {
 				jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
 			} else {
 				log.warn("dataSourceJNDI property is configured, but local JNDI context is null.");
 			}
 		} catch (NamingException e) {
-			log.debug("The name \""+poolProperties.getDataSourceJNDI()+"\" can not be found in the local context.");
+			log.debug("The name \"" + poolProperties.getDataSourceJNDI()
+					+ "\" can not be found in the local context.");
 		}
-		if (jndiDS==null) {
+		if (jndiDS == null) {
 			try {
 				context = new InitialContext();
 				jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
 			} catch (NamingException e) {
-				log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" can not be found in the InitialContext.");
+				log.warn("The name \"" + poolProperties.getDataSourceJNDI()
+						+ "\" can not be found in the InitialContext.");
 			}
 		}
-		if (jndiDS!=null) {
+		if (jndiDS != null) {
 			poolProperties.setDataSource(jndiDS);
 		}
-	}
-
-	/**
-	 * <p>Parse properties from the string. Format of the string must be [propertyName=property;]*<p>
-	 * @param propText
-	 * @return Properties
-	 * @throws Exception
-	 */
-	protected static Properties getProperties(String propText) {
-		return PoolProperties.getProperties(propText,null);
 	}
 
 }
