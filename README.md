@@ -56,7 +56,7 @@ pom.xml에 추가후에 위에 처럼 사용가능
 <dependency>
     <groupId>com.github.sejoung</groupId>
     <artifactId>tomcat-jdbc-encrypt</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
 </dependency>
 
 ```
