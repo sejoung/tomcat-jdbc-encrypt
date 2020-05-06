@@ -60,7 +60,7 @@ pom.xml에 추가후에 위에 처럼 사용가능
 </dependency>
 
 ```
-1.5 버전에 decrypt 추가
+1.6 버전에 decrypt 추가
 
 USAGE: java -jar tomcat-jdbc-encrypt-[version].jar [encrypt,decrypt] [secretKey] [string-to-encrypt,string-to-decrypt]
 
